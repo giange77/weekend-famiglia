@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Weekend" />
+  <meta name="theme-color" content="#ffffff" />
+  <title>Weekend in famiglia</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <style>
+    :root {
+      --bg:#ffffff;--bg2:#f5f5f5;--bg3:#eeeeee;
+      --text:#1a1a1a;--text2:#666666;--text3:#999999;
+      --border:rgba(0,0,0,0.12);--border2:rgba(0,0,0,0.22);
+      --radius:10px;--radius-lg:14px;
+    }
+    @media(prefers-color-scheme:dark){:root{
+      --bg:#1c1c1e;--bg2:#2c2c2e;--bg3:#3a3a3c;
+      --text:#f2f2f7;--text2:#aeaeb2;--text3:#636366;
+      --border:rgba(255,255,255,0.12);--border2:rgba(255,255,255,0.22);
+    }}
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg3);color:var(--text);min-height:100vh;}
+    .topbar{background:var(--bg);border-bottom:0.5px solid var(--border);padding:10px 12px;display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:10;}
+    .topbar-icon{width:34px;height:34px;background:var(--bg2);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;color:var(--text2);flex-shrink:0;}
+    .topbar-info{flex:1;min-width:0;}
+    .topbar-info h1{font-size:16px;font-weight:600;color:var(--text);}
+    .topbar-info p{font-size:11px;color:var(--text2);}
+    .topbar-actions{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+    .sync-badge{display:flex;align-items:center;gap:5px;font-size:11px;padding:4px 7px;border-radius:8px;border:0.5px solid var(--border);color:var(--text2);background:var(--bg2);}
+    .sync-dot{width:6px;height:6px;border-radius:50%;background:#888;flex-shrink:0;}
+    .sync-dot.ok{background:#1D9E75;}
+    .sync-dot.err{background:#E24B4A;}
+    .sync-dot.loading{background:#EF9F27;animation:pulse 1s infinite;}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+    .refresh-top-btn{display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:8px;border:0.5px solid var(--border);background:var(--bg2);color:var(--text2);cursor:pointer;font-size:16px;}
+    .reset-btn{display:flex;align-items:center;gap:4px;padding:5px 9px;border-radius:8px;border:0.5px solid #F09595;background:#FCEBEB;color:#791F1F;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;}
+    .tabs{display:flex;background:var(--bg);border-bottom:0.5px solid var(--border);overflow-x:auto;-webkit-overflow-scrolling:touch;}
+    .tab{flex:1;min-width:70px;padding:11px 6px;font-size:13px;font-weight:500;color:var(--text2);text-align:center;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all 0.15s;}
+    .tab.active{color:#185FA5;border-bottom-color:#185FA5;}
+    .content{padding:12px 12px 90px;max-width:520px;margin:0 auto;}
+    .bottom-bar{position:fixed;bottom:0;left:0;right:0;background:var(--bg);border-top:0.5px solid var(--border);padding:10px 16px;display:flex;gap:10px;z-index:20;max-width:520px;margin:0 auto;}
+    .btn-save{flex:1;padding:12px;border-radius:10px;border:none;background:#185FA5;color:#fff;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;transition:all 0.15s;}
+    .btn-save:active{background:#0C447C;}
+    .btn-sync{padding:12px 14px;border-radius:10px;border:0.5px solid var(--border);background:var(--bg2);color:var(--text2);font-size:15px;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;}
+    .card{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:14px 16px;margin-bottom:12px;}
+    .card-title{font-size:13px;font-weight:600;color:var(--text2);margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;}
+    .card-title-left{display:flex;align-items:center;gap:7px;}
+    .meal-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+    .meal-card{border:0.5px solid var(--border);border-radius:var(--radius);padding:10px;}
+    .meal-label{font-size:12px;color:var(--text2);margin-bottom:7px;display:flex;align-items:center;gap:5px;}
+    .toggle-row{display:flex;gap:5px;margin-bottom:4px;}
+    .toggle-btn{flex:1;padding:6px 3px;border-radius:8px;border:0.5px solid var(--border);background:transparent;cursor:pointer;font-size:11px;color:var(--text2);font-family:inherit;transition:all 0.15s;}
+    .toggle-btn.active-home{background:#E1F5EE;border-color:#0F6E56;color:#085041;}
+    .toggle-btn.active-out{background:#EEEDFE;border-color:#534AB7;color:#3C3489;}
+    .meal-input{width:100%;margin-top:6px;padding:6px 8px;border:0.5px solid var(--border);border-radius:8px;font-size:12px;background:var(--bg2);color:var(--text);font-family:inherit;}
+    .meal-input:focus{outline:none;border-color:var(--border2);}
+    .with-label{font-size:10px;color:var(--text3);margin-top:6px;margin-bottom:3px;}
+    .with-row{display:flex;gap:5px;}
+    .with-btn{flex:1;padding:5px 3px;border-radius:8px;border:0.5px solid var(--border);background:transparent;cursor:pointer;font-size:10px;color:var(--text2);font-family:inherit;transition:all 0.15s;}
+    .with-btn.active{background:#FAEEDA;border-color:#854F0B;color:#633806;}
+    .activities-list{display:flex;flex-direction:column;gap:8px;}
+    .activity-item{border:0.5px solid var(--border);border-radius:var(--radius);padding:10px 12px;display:flex;align-items:flex-start;gap:10px;}
+    .activity-emoji{font-size:20px;line-height:1;margin-top:1px;}
+    .activity-info{flex:1;min-width:0;}
+    .activity-name{font-size:14px;font-weight:500;color:var(--text);}
+    .activity-meta{font-size:12px;color:var(--text2);margin-top:2px;display:flex;align-items:center;gap:4px;}
+    .activity-badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:999px;margin-top:5px;}
+    .badge-solo{background:#E6F1FB;color:#0C447C;}
+    .badge-amici{background:#FAEEDA;color:#633806;}
+    .delete-btn{border:none;background:none;cursor:pointer;color:var(--text3);font-size:18px;padding:2px;border-radius:6px;flex-shrink:0;}
+    .cal-btn{border:none;background:none;cursor:pointer;color:#185FA5;font-size:18px;padding:2px;border-radius:6px;flex-shrink:0;}
+    .add-form{border:0.5px dashed var(--border2);border-radius:var(--radius);padding:12px;margin-top:8px;}
+    .add-form-title{font-size:12px;font-weight:600;color:var(--text2);margin-bottom:10px;}
+    .form-input{width:100%;padding:8px 10px;border:0.5px solid var(--border);border-radius:8px;font-size:13px;background:var(--bg);color:var(--text);font-family:inherit;margin-bottom:8px;}
+    .form-input:focus{outline:none;border-color:var(--border2);}
+    .form-row2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
+    .form-actions{display:flex;gap:8px;}
+    .btn-add{flex:1;padding:9px;border-radius:8px;border:0.5px solid var(--border2);background:var(--bg2);cursor:pointer;font-size:13px;font-weight:500;color:var(--text);font-family:inherit;}
+    .btn-cancel{padding:9px 14px;border-radius:8px;border:0.5px solid var(--border);background:transparent;cursor:pointer;font-size:13px;color:var(--text2);font-family:inherit;}
+    .show-add-btn{width:100%;padding:11px;border-radius:var(--radius);border:0.5px dashed var(--border2);background:transparent;cursor:pointer;font-size:13px;color:var(--text2);display:flex;align-items:center;justify-content:center;gap:6px;margin-top:8px;font-family:inherit;}
+    .empty-state{text-align:center;padding:24px;color:var(--text3);font-size:13px;}
+    .empty-state i{font-size:28px;display:block;margin-bottom:8px;}
+    .summary-day{margin-bottom:14px;}
+    .summary-day-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:8px;padding-bottom:6px;border-bottom:0.5px solid var(--border);}
+    .summary-row{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text2);padding:4px 0;}
+    .summary-row i{font-size:15px;flex-shrink:0;}
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px;}
+    .confirm-box{background:var(--bg);border-radius:var(--radius-lg);padding:20px;max-width:300px;width:100%;}
+    .confirm-box h3{font-size:16px;font-weight:600;color:var(--text);margin-bottom:8px;}
+    .confirm-box p{font-size:13px;color:var(--text2);margin-bottom:18px;line-height:1.5;}
+    .confirm-actions{display:flex;gap:8px;}
+    .btn-confirm-reset{flex:1;padding:10px;border-radius:9px;border:none;background:#FCEBEB;color:#791F1F;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;}
+    .btn-confirm-cancel{flex:1;padding:10px;border-radius:9px;border:0.5px solid var(--border);background:var(--bg2);color:var(--text2);font-size:13px;cursor:pointer;font-family:inherit;}
+    .install-banner{background:#E6F1FB;border:0.5px solid #85B7EB;border-radius:var(--radius);padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px;}
+    .install-banner p{font-size:12px;color:#0C447C;flex:1;line-height:1.4;}
+    .install-banner button{background:none;border:none;color:#0C447C;font-size:18px;cursor:pointer;flex-shrink:0;}
+  </style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-icon"><i class="ti ti-calendar-week"></i></div>
+  <div class="topbar-info">
+    <h1>Weekend in famiglia</h1>
+    <p>Piano condiviso &middot; aggiornamento automatico</p>
+  </div>
+  <div class="topbar-actions">
+    <div class="sync-badge">
+      <div class="sync-dot loading" id="sync-dot"></div>
+      <span id="sync-label">Connessione...</span>
+    </div>
+    <button class="reset-btn" onclick="askReset()">
+      <i class="ti ti-trash" style="font-size:13px"></i> Reset
+    </button>
+  </div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="switchDay(0)">Venerd&#236;</div>
+  <div class="tab" onclick="switchDay(1)">Sabato</div>
+  <div class="tab" onclick="switchDay(2)">Domenica</div>
+  <div class="tab" onclick="switchDay(3)"><i class="ti ti-list" style="font-size:13px;vertical-align:-1px"></i> Riepilogo</div>
+</div>
+
+<div class="content">
+  <div id="install-banner" class="install-banner" style="display:none">
+    <p>Tocca Condividi &rarr; &ldquo;Aggiungi a schermata Home&rdquo; per usarla come app!</p>
+    <button onclick="document.getElementById('install-banner').style.display='none'"><i class="ti ti-x"></i></button>
+  </div>
+  <div id="day-panel"><div class="card"><div class="empty-state"><i class="ti ti-loader"></i>Caricamento...</div></div></div>
+</div>
+
+<div id="confirm-overlay" style="display:none" class="overlay">
+  <div class="confirm-box">
+    <h3><i class="ti ti-alert-triangle" style="font-size:16px;vertical-align:-2px;margin-right:6px;color:#BA7517"></i>Resettare il piano?</h3>
+    <p>Tutti i pasti e le attivit&agrave; verranno cancellati. L&rsquo;operazione non &egrave; reversibile.</p>
+    <div class="confirm-actions">
+      <button class="btn-confirm-cancel" onclick="cancelReset()">Annulla</button>
+      <button class="btn-confirm-reset" onclick="confirmReset()"><i class="ti ti-trash" style="font-size:13px;vertical-align:-1px"></i> S&igrave;, resetta</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// BIN ID fisso — non cambia mai
+const API_KEY = '$2a$10$L/soV7i8VAsPahA1hsdK2eIa87GD17qdTR39CnWKyScwok37KEPzK';
+const BIN_ID  = '6a05fe70adc21f119a9de82c';
+
+let currentDay = 0;
+let showAddForm = false;
+let isSaving = false;
+let pendingSave = false;
+
+const DAYS = ['Venerd\u00ec','Sabato','Domenica'];
+const MEAL_ICONS = { pranzo:'ti-sun', cena:'ti-moon' };
+const EMOJIS = { bici:'\u{1F6B4}', trekking:'\u{1F97E}', picnic:'\u{1F9FA}', evento:'\u{1F3AD}', nuoto:'\u{1F3CA}', museo:'\u{1F3DB}', shopping:'\u{1F6CD}', sport:'\u26BD', altro:'\u2728' };
+
+const defaultState = () => ({
+  days: DAYS.map(d => ({
+    name: d,
+    meals: {
+      pranzo: { location: null, with: null, restaurant: '', menu: '', participants: '' },
+      cena:   { location: null, with: null, restaurant: '', menu: '', participants: '' }
+    },
+    activities: []
+  }))
+});
+
+let state = defaultState();
+
+if (/iphone|ipad|ipod/i.test(navigator.userAgent) && !window.navigator.standalone) {
+  document.getElementById('install-banner').style.display = 'flex';
+}
+
+function setSyncStatus(s, t) {
+  const dot = document.getElementById('sync-dot');
+  const lbl = document.getElementById('sync-label');
+  if (dot) dot.className = 'sync-dot ' + s;
+  if (lbl) lbl.textContent = t;
+}
+
+async function loadState() {
+  if (isSaving) return;
+  setSyncStatus('loading', 'Aggiornamento...');
+  try {
+    const r = await fetch('https://api.jsonbin.io/v3/b/' + BIN_ID + '/latest?nocache=' + Date.now(), {
+      headers: { 'X-Master-Key': API_KEY, 'Cache-Control': 'no-cache' }
+    });
+    if (!r.ok) throw new Error('load error');
+    const data = await r.json();
+    state = data.record;
+    setSyncStatus('ok', 'Sincronizzato');
+    render();
+  } catch(e) {
+    setSyncStatus('err', 'Errore connessione');
+  }
+}
+
+async function _doSave() {
+  isSaving = true;
+  setSyncStatus('loading', 'Salvataggio...');
+  const snapshot = JSON.stringify(state);
+  try {
+    const r = await fetch('https://api.jsonbin.io/v3/b/' + BIN_ID, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'X-Master-Key': API_KEY },
+      body: snapshot
+    });
+    if (!r.ok) throw new Error('save error');
+    setSyncStatus('ok', 'Salvato');
+  } catch(e) {
+    setSyncStatus('err', 'Errore salvataggio');
+  }
+  isSaving = false;
+  if (pendingSave) { pendingSave = false; _doSave(); }
+}
+
+function saveState() {
+  if (isSaving) { pendingSave = true; return; }
+  _doSave();
+}
+
+function switchDay(i) {
+  currentDay = i; showAddForm = false;
+  document.querySelectorAll('.tab').forEach((t,idx) => t.classList.toggle('active', idx===i));
+  render();
+}
+
+function setMealLocation(d, meal, val) {
+  state.days[d].meals[meal].location = val;
+  render(); saveState();
+}
+function setMealWith(d, meal, val) {
+  state.days[d].meals[meal].with = val;
+  render(); saveState();
+}
+function setMealMenu(d, meal, val) {
+  state.days[d].meals[meal].menu = val;
+  clearTimeout(window._rt); window._rt = setTimeout(saveState, 900);
+}
+function setRestaurantName(d, meal, val) {
+  state.days[d].meals[meal].restaurant = val;
+  clearTimeout(window._rt); window._rt = setTimeout(saveState, 900);
+}
+function setMealParticipants(d, meal, val) {
+  state.days[d].meals[meal].participants = val;
+  clearTimeout(window._rt); window._rt = setTimeout(saveState, 900);
+}
+function addActivity(d) {
+  const name = document.getElementById('act-name').value.trim();
+  const type = document.getElementById('act-type').value;
+  const location = document.getElementById('act-loc').value.trim();
+  const w = document.getElementById('act-with').value;
+  const time = document.getElementById('act-time').value;
+  if (!name) return;
+  state.days[d].activities.push({ name, type, location, with: w, time, id: Date.now() });
+  showAddForm = false; render(); saveState();
+}
+function deleteActivity(d, id) {
+  state.days[d].activities = state.days[d].activities.filter(a => a.id !== id);
+  render(); saveState();
+}
+function askReset() { document.getElementById('confirm-overlay').style.display = 'flex'; }
+function cancelReset() { document.getElementById('confirm-overlay').style.display = 'none'; }
+async function confirmReset() {
+  document.getElementById('confirm-overlay').style.display = 'none';
+  state = defaultState(); render(); await _doSave();
+  setSyncStatus('ok', 'Piano resettato');
+}
+
+function renderMealCard(d, meal) {
+  const m = state.days[d].meals[meal];
+  const icon = MEAL_ICONS[meal];
+  const label = meal.charAt(0).toUpperCase() + meal.slice(1);
+  return '<div class="meal-card">' +
+    '<div class="meal-label"><i class="ti ' + icon + '" style="font-size:13px"></i> ' + label + '</div>' +
+    '<div class="toggle-row">' +
+      '<button class="toggle-btn ' + (m.location==='casa'?'active-home':'') + '" onclick="setMealLocation(' + d + ',\'' + meal + '\',\'casa\')"><i class="ti ti-home"></i> Casa</button>' +
+      '<button class="toggle-btn ' + (m.location==='fuori'?'active-out':'') + '" onclick="setMealLocation(' + d + ',\'' + meal + '\',\'fuori\')"><i class="ti ti-building-store"></i> Fuori</button>' +
+    '</div>' +
+    (m.location === 'casa' ? '<input class="meal-input" type="text" placeholder="Cosa cuciniamo?" value="' + (m.menu||'').replace(/"/g,'&quot;') + '" oninput="setMealMenu(' + d + ',\'' + meal + '\',this.value)" />' : '') +
+    (m.location === 'fuori' ? '<input class="meal-input" type="text" placeholder="Dove / da chi?" value="' + (m.restaurant||'').replace(/"/g,'&quot;') + '" oninput="setRestaurantName(' + d + ',\'' + meal + '\',this.value)" />' : '') +
+    (m.location ? (
+      '<div class="with-label">Con chi?</div>' +
+      '<div class="with-row">' +
+        '<button class="with-btn ' + (m.with==='famiglia'?'active':'') + '" onclick="setMealWith(' + d + ',\'' + meal + '\',\'famiglia\')">&#128106; Famiglia</button>' +
+        '<button class="with-btn ' + (m.with==='amici'?'active':'') + '" onclick="setMealWith(' + d + ',\'' + meal + '\',\'amici\')">&#128101; Amici</button>' +
+      '</div>' +
+      (m.with ? '<input class="meal-input" type="text" placeholder="Chi partecipa? (opzionale)" value="' + (m.participants||'').replace(/"/g,'&quot;') + '" oninput="setMealParticipants(' + d + ',\'' + meal + '\',this.value)" />' : '')
+    ) : '<div style="font-size:10px;color:var(--text3);margin-top:4px">Seleziona dove mangiare</div>') +
+  '</div>';
+}
+
+function renderDayPanel(d) {
+  const day = state.days[d];
+  const acts = day.activities;
+  let html = '<div class="card">' +
+    '<div class="card-title"><div class="card-title-left"><i class="ti ti-tools-kitchen-2"></i> Pasti del giorno</div></div>' +
+    '<div class="meal-grid">' + renderMealCard(d,'pranzo') + renderMealCard(d,'cena') + '</div>' +
+  '</div>';
+
+  html += '<div class="card">';
+  html += '<div class="card-title"><div class="card-title-left"><i class="ti ti-run"></i> Attivit&agrave; del giorno</div></div>';
+  html += '<div class="activities-list">';
+  if (acts.length === 0) html += '<div class="empty-state"><i class="ti ti-mood-smile"></i>Nessuna attivit&agrave; ancora</div>';
+  acts.forEach(function(a) {
+    html += '<div class="activity-item">' +
+      '<span class="activity-emoji">' + (EMOJIS[a.type]||'\u2728') + '</span>' +
+      '<div class="activity-info">' +
+        '<div class="activity-name">' + a.name + '</div>' +
+        (a.time ? '<div class="activity-meta"><i class="ti ti-clock" style="font-size:12px"></i> ' + a.time + '</div>' : '') +
+        (a.location ? '<div class="activity-meta"><i class="ti ti-map-pin" style="font-size:12px"></i> ' + a.location + '</div>' : '') +
+        '<span class="activity-badge ' + (a.with==='amici'?'badge-amici':'badge-solo') + '">' + (a.with==='amici'?'&#128101; Con amici':'&#128106; Famiglia') + '</span>' +
+      '</div>' +
+      '<div style="display:flex;flex-direction:column;gap:4px;align-items:center">' +
+        '<button class="cal-btn" onclick="openCalendar(' + d + ',' + a.id + ')" aria-label="Aggiungi a Google Calendar"><i class="ti ti-calendar-plus"></i></button>' +
+        '<button class="delete-btn" onclick="deleteActivity(' + d + ',' + a.id + ')"><i class="ti ti-x"></i></button>' +
+      '</div>' +
+    '</div>';
+  });
+  html += '</div>';
+
+  if (showAddForm) {
+    html += '<div class="add-form">' +
+      '<div class="add-form-title">Nuova attivit&agrave;</div>' +
+      '<input id="act-name" class="form-input" type="text" placeholder="Es. Giro in bici al parco..." />' +
+      '<div class="form-row2">' +
+        '<select id="act-type" class="form-input" style="margin-bottom:0">' +
+          '<option value="bici">&#128692; Bici</option>' +
+          '<option value="trekking">&#129406; Trekking</option>' +
+          '<option value="picnic">&#129914; Picnic</option>' +
+          '<option value="evento">&#127917; Evento</option>' +
+          '<option value="nuoto">&#127946; Nuoto</option>' +
+          '<option value="museo">&#127963; Museo</option>' +
+          '<option value="shopping">&#128717; Shopping</option>' +
+          '<option value="sport">&#9917; Sport</option>' +
+          '<option value="altro">&#10024; Altro</option>' +
+        '</select>' +
+        '<select id="act-with" class="form-input" style="margin-bottom:0">' +
+          '<option value="famiglia">&#128106; Famiglia</option>' +
+          '<option value="amici">&#128101; Con amici</option>' +
+        '</select>' +
+      '</div>' +
+      '<input id="act-loc" class="form-input" type="text" placeholder="Location (opzionale)..." style="margin-top:8px" />' +
+      '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">' +
+        '<label style="font-size:12px;color:var(--text2);white-space:nowrap">&#128336; Orario</label>' +
+        '<input id="act-time" class="form-input" type="time" style="margin-bottom:0;flex:1" />' +
+      '</div>' +
+      '<div class="form-actions">' +
+        '<button class="btn-cancel" onclick="showAddForm=false;render()">Annulla</button>' +
+        '<button class="btn-add" onclick="addActivity(' + d + ')"><i class="ti ti-plus"></i> Aggiungi</button>' +
+      '</div>' +
+    '</div>';
+  } else {
+    html += '<button class="show-add-btn" onclick="showAddForm=true;render()"><i class="ti ti-plus"></i> Aggiungi attivit&agrave;</button>';
+  }
+  html += '</div>';
+  return html;
+}
+
+function renderSummary() {
+  const allEmpty = state.days.every(function(d) {
+    return !d.meals.pranzo.location && !d.meals.cena.location && d.activities.length===0;
+  });
+  if (allEmpty) return '<div class="card"><div class="empty-state"><i class="ti ti-clipboard"></i>Nessun piano ancora.<br>Inizia da venerd&igrave;!</div></div>';
+
+  let html = '<div class="card">';
+  state.days.forEach(function(day) {
+    const p = day.meals.pranzo, c = day.meals.cena;
+    const has = p.location || c.location || day.activities.length > 0;
+    html += '<div class="summary-day"><div class="summary-day-title">' + day.name + '</div>';
+    if (!has) { html += '<div style="font-size:12px;color:var(--text3);padding:4px 0">Nessun piano</div>'; }
+    if (p.location) {
+      const where = p.location==='fuori' ? (p.restaurant||'Fuori') : 'Casa' + (p.menu?' &middot; '+p.menu:'');
+      const who = p.with ? ' &middot; ' + (p.with==='amici'?'&#128101; Amici':'&#128106; Famiglia') + (p.participants?' ('+p.participants+')':'') : '';
+      html += '<div class="summary-row"><i class="ti ti-sun"></i> Pranzo: ' + where + who + '</div>';
+    }
+    if (c.location) {
+      const where = c.location==='fuori' ? (c.restaurant||'Fuori') : 'Casa' + (c.menu?' &middot; '+c.menu:'');
+      const who = c.with ? ' &middot; ' + (c.with==='amici'?'&#128101; Amici':'&#128106; Famiglia') + (c.participants?' ('+c.participants+')':'') : '';
+      html += '<div class="summary-row"><i class="ti ti-moon"></i> Cena: ' + where + who + '</div>';
+    }
+    day.activities.forEach(function(a) {
+      html += '<div class="summary-row">' + (EMOJIS[a.type]||'\u2728') + ' ' + a.name + (a.time?' &#128336; '+a.time:'') + (a.location?' &middot; '+a.location:'') + '</div>';
+    });
+    html += '</div>';
+  });
+  html += '</div>';
+  return html;
+}
+
+function openCalendar(d, id) {
+  const day = state.days[d];
+  const a = day.activities.find(function(x){ return x.id === id; });
+  if (!a) return;
+  // Compute date: next Friday=d0, Saturday=d1, Sunday=d2
+  const today = new Date();
+  const dow = today.getDay(); // 0=Sun,1=Mon,...,5=Fri,6=Sat
+  const daysToFriday = (5 - dow + 7) % 7 || 7;
+  const base = new Date(today);
+  base.setDate(today.getDate() + daysToFriday + d);
+  const yyyy = base.getFullYear();
+  const mm = String(base.getMonth()+1).padStart(2,'0');
+  const dd = String(base.getDate()).padStart(2,'0');
+  let startStr, endStr;
+  if (a.time) {
+    const parts = a.time.split(':');
+    const hh = parts[0]; const min = parts[1]||'00';
+    const endH = String((parseInt(hh)+1)%24).padStart(2,'0');
+    startStr = yyyy+mm+dd+'T'+hh+min+'00';
+    endStr   = yyyy+mm+dd+'T'+endH+min+'00';
+  } else {
+    startStr = yyyy+mm+dd;
+    endStr   = yyyy+mm+dd;
+  }
+  const title = encodeURIComponent(a.name);
+  const loc   = encodeURIComponent(a.location||'');
+  const url = 'https://calendar.google.com/calendar/render?action=TEMPLATE' +
+    '&text=' + title +
+    '&dates=' + startStr + '/' + endStr +
+    (loc ? '&location=' + loc : '');
+  window.open(url, '_blank');
+}
+
+function saveAndShow() {
+  const btn = document.querySelector('.btn-save');
+  if (btn) { btn.innerHTML = '<i class="ti ti-loader" style="font-size:18px"></i> Salvataggio...'; btn.disabled = true; }
+  _doSave().then(function() {
+    if (btn) { btn.innerHTML = '<i class="ti ti-check" style="font-size:18px"></i> Salvato!'; }
+    setTimeout(function() {
+      if (btn) { btn.innerHTML = '<i class="ti ti-device-floppy" style="font-size:18px"></i> Salva'; btn.disabled = false; }
+    }, 1500);
+  });
+}
+
+function render() {
+  document.getElementById('day-panel').innerHTML = currentDay < 3 ? renderDayPanel(currentDay) : renderSummary();
+}
+
+loadState();
+</script>
+<div class="bottom-bar">
+  <button class="btn-sync" onclick="loadState()" aria-label="Aggiorna dati">
+    <i class="ti ti-refresh" style="font-size:18px"></i>
+  </button>
+  <button class="btn-save" onclick="saveAndShow()">
+    <i class="ti ti-device-floppy" style="font-size:18px"></i> Salva
+  </button>
+</div>
+</body>
+</html>
